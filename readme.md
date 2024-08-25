@@ -1,1 +1,1 @@
-https://loripsum.net/#
+Shows part of the code of the site
