@@ -10,10 +10,12 @@
             overflow: visible;
             margin: 0px;
             padding: 0px;
+            user-select: none;
         }
 
         body {
-            overflow: hidden    ;
+            overflow: hidden;
+            background-color: black;
         }
 
         :root {
@@ -21,23 +23,17 @@
         }
 
         #main {
-            /* width: 2048px;
-            height: 2048px;
-
-            transform-origin: left top;
-            transform: scale(.5); */
             text-align: center;
+            width: 150vw;
         }
 
 
         .letterContainer {
             width: 200px;
             height: 200px;
-            /* display: inline-flex; */
             justify-content: center;
             align-items: center;
             flex-direction: column;
-            /* mix-blend-mode: exclusion; */
             position: relative;
             display: inline-block;
         }
@@ -51,10 +47,21 @@
             opacity: 0.9;
         }
 
+        #curtain {
+            position: fixed;
+            top: 0px;
+            left: 0px;
+            width: 100vw;
+            height: 100vh;
+            z-index: 200;
+            background-color: black;
+        }
+
     </style>
 </head>
 <body>
     <div id="main"></div>
+    <div id="curtain"></div>
     
     <script>
         'use strict'
@@ -68,6 +75,8 @@
             'blue',
             'yellow',
             'purple',
+            'white',
+            'white',
             'black',
         ];
         const main = document.getElementById('main');
@@ -109,9 +118,7 @@
         }
 
         async function generatePage() {
-            // main.innerHTML = '';
             const realText = (await getText()).replaceAll('\n', '').replaceAll(' ', '');
-            console.log(realText);
             for (let i = 0; i < realText.length; i++) {
                 const letterDiv = document.createElement('div');
                 letterDiv.classList.add('letterContainer');
@@ -156,6 +163,13 @@
         }
 
         generatePage();
+
+        document.getElementById('curtain').onclick = _ => {
+            document.getElementById('curtain').remove();
+        }
+        main.onclick = _ => {
+            moveAtRandomPoint();
+        }
 
     </script>
 </body>
