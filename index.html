@@ -1,37 +1,176 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="styles.css" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Iron Curtain by #808080</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <style>
+        *{
+            overflow: visible;
+            margin: 0px;
+            padding: 0px;
+            user-select: none;
+        }
+
+        body {
+            overflow: hidden;
+            background-color: black;
+        }
+
+        :root {
+            --baldness: 100px;
+        }
+
+        #main {
+            text-align: center;
+            width: 150vw;
+        }
+
+
+        .letterContainer {
+            width: 200px;
+            height: 200px;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            position: relative;
+            display: inline-block;
+        }
+        .letterSvg {
+            width: 100%;
+            height: 100%;
+            transform-origin: center center;
+            transform: scale(2);
+            mix-blend-mode: hard-light;
+            position: absolute;
+            opacity: 0.9;
+        }
+
+        #curtain {
+            position: fixed;
+            top: 0px;
+            left: 0px;
+            width: 100vw;
+            height: 100vh;
+            z-index: 200;
+            background-color: black;
+        }
+
+    </style>
 </head>
 <body>
-    <div id="main">
-        <!-- <div class="letter">
-            A
-        </div>
-        <div class="letterContainer">
-            <svg class="letterSvg" style="width: 100%; height: 100%;">
-                <text x="0" y="90" fill="black" stroke="red" stroke-width="21" font-family="Noto Sans" font-size="100px" font-weight="800">a</text>
-            </svg>
-        </div> -->
-
-        <div class="letterContainer">
-            <svg class="letterSvg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice">
-              <text x="50%" y="50%" fill="red" stroke="red" stroke-width="10" font-family="Noto Sans" font-size="100" font-weight="800" text-anchor="middle" dominant-baseline="middle">a</text>
-            </svg>
-            <svg class="letterSvg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" style="top: 20px; left: 20px;">
-              <text x="50%" y="50%" fill="yellow" stroke="yellow" stroke-width="10" font-family="Noto Sans" font-size="100" font-weight="800" text-anchor="middle" dominant-baseline="middle">a</text>
-            </svg>
-        </div>
-        <div class="letterContainer">
-            <svg class="letterSvg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice">
-              <text x="50%" y="50%" fill="blue" stroke="blue" stroke-width="10" font-family="Noto Sans" font-size="100" font-weight="800" text-anchor="middle" dominant-baseline="middle">a</text>
-            </svg>
-        </div>
-    </div>
+    <div id="main"></div>
+    <div id="curtain"></div>
     
-    <script src="app.js"></script>
+    <script>
+        'use strict'
+
+        const LETTER_WIDTH = 128;
+        const LETTER_HEIGHT = 128;
+        const LETTERS_COUNT = 256;
+        const COLORS = [
+            'red',
+            'green',
+            'blue',
+            'yellow',
+            'purple',
+            'white',
+            'white',
+            'black',
+        ];
+        const main = document.getElementById('main');
+        const SVG_NS = 'http://www.w3.org/2000/svg';
+        const SAME_LETTER_SHIFT = 10;
+        const STROKE_WIDTH = 10;
+        const LETTER_SCALE = 1.8;
+
+        function getColor() {
+            return COLORS[randomInt(0, COLORS.length)];
+        }
+        function randomInt(a, b) {
+            if (b <= a) {
+                throw new Error("b must be greater than a");
+            }
+            return Math.floor(Math.random() * (b - a) + a);
+        }
+        function map(num, frombottom, fromtop, tobottom, totop) {
+            let a = num - frombottom;
+            a *= (totop-tobottom)/(fromtop-frombottom);
+            a += tobottom;
+            return a;
+        }
+
+        async function getText() {
+            try {
+                const response = await fetch(window.location.href);
+                const text = await response.text();
+                return text;
+            } catch (error) {
+                console.error('Error fetching text:', error);
+                return 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nihil minus, contraque illa hereditate dives ob eamque rem laetus. Quae quo sunt excelsiores, eo dant clariora indicia naturae. Qui potest igitur habitare in beata vita summi mali metus? Possumusne ergo in vita summum bonum dicere, cum id ne in cena quidem posse videamur? Ergo, si semel tristior effectus est, hilara vita amissa est? Ut optime, secundum naturam affectum esse possit. Duo Reges: constructio interrete. An hoc usque quaque, aliter in vita?';
+            }
+        }
+
+        function moveAtRandomPoint() {
+            const randomY = Math.floor(Math.random() * main.scrollHeight);
+            window.scrollTo(0, randomY);
+        }
+
+        async function generatePage() {
+            const realText = (await getText()).replaceAll('\n', '').replaceAll(' ', '');
+            for (let i = 0; i < realText.length; i++) {
+                const letterDiv = document.createElement('div');
+                letterDiv.classList.add('letterContainer');
+                // letterDiv.style.backgroundColor = getColor();
+
+                for (let j = -1; j < 2; j++) {
+                    const letterSvg = document.createElementNS(SVG_NS, 'svg');
+                    letterSvg.classList.add('letterSvg');
+                    letterSvg.style.top = SAME_LETTER_SHIFT * j + 'px';
+                    letterSvg.style.left = SAME_LETTER_SHIFT * j + 'px';
+                    // letterSvg.setAttributeNS(SVG_NS, 'viewBox', '0 0 100 100');
+                    // letterSvg.setAttributeNS(SVG_NS, 'preserveAspectRatio', 'xMidYMid slice');
+                    letterSvg.setAttribute('viewBox', '0 0 100 100');
+                    letterSvg.setAttribute('preserveAspectRatio', 'xMidYMid slice');
+
+                    const letterText = document.createElementNS(SVG_NS, 'text');
+                    letterSvg.style.transform = `rotate(${map(Math.random(), 0, 1, -10, 10)}deg) scale(${LETTER_SCALE})`;
+
+                    letterText.setAttribute('x', '50%');
+                    letterText.setAttribute('y', '50%');
+                    const color = getColor();
+                    letterText.setAttribute('fill', color);
+                    letterText.setAttribute('stroke', color);
+                    letterText.setAttribute('stroke-width', STROKE_WIDTH);
+                    letterText.setAttribute('font-family', 'Noto Sans');
+                    letterText.setAttribute('font-size', 100);
+                    letterText.setAttribute('font-weight', 800);
+                    letterText.setAttribute('text-anchor', 'middle');
+                    letterText.setAttribute('dominant-baseline', 'middle');
+                    letterText.style.zIndex = randomInt(1, 512);
+
+                    letterText.innerHTML = Math.random() < .5 ? realText[i].toLowerCase() : realText[i].toUpperCase();
+                    // letterText.innerText = realText[i];
+                    letterSvg.appendChild(letterText);
+                    letterDiv.appendChild(letterSvg);
+                }
+
+                main.appendChild(letterDiv);
+            }
+        
+            moveAtRandomPoint();
+        }
+
+        generatePage();
+
+        document.getElementById('curtain').onclick = _ => {
+            document.getElementById('curtain').remove();
+        }
+        main.onclick = _ => {
+            moveAtRandomPoint();
+        }
+
+    </script>
 </body>
 </html>
